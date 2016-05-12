@@ -1,0 +1,18 @@
+{
+  "title": "hapinode",
+  "source": "./",
+  "destination": "./out/esdoc",
+  "excludes": [
+    ".git",
+    "node_modules",
+    "public"
+  ],
+  "access": ["public", "protected", "private"],
+  "coverage": false,
+  "includeSource": true,
+  "unexportIdentifier": true,
+  "undocumentIdentifier": false,
+  "manual": {
+      "changelog": ["./README.md"]
+  }
+}

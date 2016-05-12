@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">hapinode/server.js | hapinode API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">src</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/hapinode/src/MyClass.js~MyClass.html">MyClass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/hapinode/src/MySuperClass.js~MySuperClass.html">MySuperClass</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">hapinode/server.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;;
+
+const Hapi = require(&apos;hapi&apos;), // the web server framework
+    Boom = require(&apos;boom&apos;), // Enhanced error object
+    Good = require(&apos;good&apos;), // hapi logging
+    Joi = require(&apos;joi&apos;), // JS Object validation
+    Inert = require(&apos;inert&apos;), // access public resources, like .html files
+    Vision = require(&apos;vision&apos;), // plugin for template engine setup
+    r = require(&apos;request&apos;), // node.js http module wrapper
+    server = new Hapi.Server();
+
+server.connection({ port: 3000 });
+
+// routes...
+
+server.route({
+    method: &apos;GET&apos;,
+    path: &apos;/healthcheck&apos;,
+    handler: (request, reply) =&gt; {
+      // r(&apos;&apos;, (error, response, body) =&gt; {
+      //     reply(JSON.parse(body));
+      // });
+    },
+    config: {
+        &apos;description&apos;: &apos;what the route does...&apos;,
+        &apos;notes&apos;: &apos;any type of notes on the route...&apos;,
+        &apos;tags&apos;: [&apos;api&apos;]
+    }
+});
+
+// valid articleId:
+server.route({
+    method: &apos;GET&apos;,
+    path: &apos;/api/v1/push-api/articles/{articleId}&apos;,
+    handler: (request, reply) =&gt; {
+        // r(`${encodeURIComponent(request.params.name)}`, (error, response, body) =&gt; {
+        //     reply(JSON.parse(body));
+        // });
+    }
+});
+
+// valid channelId:
+server.route({
+    method: &apos;GET&apos;,
+    path: &apos;/api/v1/push-api/channels/{channelId}&apos;,
+    handler: (request, reply) =&gt; {
+        // r(`/${encodeURIComponent(request.params.name)}`, (error, response, body) =&gt; {
+        //     reply(JSON.parse(body));
+        // });
+    }
+});
+
+// Joi &amp; Boom testing...
+server.route({
+    method: &apos;GET&apos;,
+    path: &apos;/http/error&apos;,
+    handler: (request, reply) =&gt; {
+        r(&apos;http://someurl.doesnotexist.com&apos;, (error, response, body) =&gt; {
+            if (!error &amp;&amp; response.statusCode !== 404) {
+                reply(body);
+            }
+
+            let err = new Error(error),
+                // Boom usage...
+                boomErr = Boom.wrap(err, 404);
+            console.log(boomErr);
+
+            let schema = {
+                a: Joi.string(),
+                b: Joi.number()
+            };
+            Joi.validate({a: &apos;a string&apos;, b: 25}, schema, (err, value) =&gt; {
+                if (err) {
+                    throw err;
+                }
+                console.log(&apos;Joi let me know my object has valid values within...&apos;);
+            });
+
+            reply(&apos;There was an error accessing content via this API route...&apos;);
+        });
+    }
+});
+
+// Inert &amp; Vision testing...
+server.route({
+    method: &apos;GET&apos;,
+    path: &apos;/index&apos;,
+    handler: function (request, reply) {
+        reply.file(&apos;./public/index.html&apos;);
+    }
+});
+
+
+
+// GET
+// /api/v1/push-api/channels/{channelId}/sections
+// /api/v1/push-api/search/channels
+// /api/v1/push-api/sections/{sectionId}
+// /api/v1/stats/article/{url}
+
+// POST
+// /api/v1/log/failure
+// /api/v1/post/{type}/{url}
+// /api/v1/stats/apple-push
+
+// DELETE
+// /api/v1/push-api/articles/{articleId}
+
+server.register([
+    Inert,
+    Vision
+], function error(err) {
+    if (err) {
+        throw err;
+    }
+});
+
+// must figure this out =(
+// server.register({
+//     register: Good,
+//     options: {
+//         reporters: [{
+//             reporter: require(&apos;good-console&apos;),
+//             events: {
+//                 response: &apos;*&apos;,
+//                 log: &apos;*&apos;
+//             }
+//         }]
+//     }
+// }, (err) =&gt; {
+//     if (err) {
+//         throw err;
+//     }
+    server.start((err) =&gt; {
+        if (err) {
+           throw err;
+        }
+        console.log(&apos;Hapi.js server start listening on port 3000...&apos;);
+        server.log(&apos;info&apos;, &apos;Server running at: &apos; + server.info.uri);
+    });
+// });
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.7)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
