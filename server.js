@@ -17,9 +17,9 @@ server.route({
     method: 'GET',
     path: '/healthcheck',
     handler: (request, reply) => {
-      r('http://localhost:5000/healthcheck', (error, response, body) => {
-          reply(JSON.parse(body));
-      });
+      // r('', (error, response, body) => {
+      //     reply(JSON.parse(body));
+      // });
     },
     config: {
         'description': 'what the route does...',
@@ -33,9 +33,9 @@ server.route({
     method: 'GET',
     path: '/api/v1/push-api/articles/{articleId}',
     handler: (request, reply) => {
-        r(`http://localhost:5000/api/v1/push-api/articles/${encodeURIComponent(request.params.name)}`, (error, response, body) => {
-            reply(JSON.parse(body));
-        });
+        // r(`${encodeURIComponent(request.params.name)}`, (error, response, body) => {
+        //     reply(JSON.parse(body));
+        // });
     }
 });
 
@@ -44,9 +44,9 @@ server.route({
     method: 'GET',
     path: '/api/v1/push-api/channels/{channelId}',
     handler: (request, reply) => {
-        r(`http://localhost:5000/api/v1/push-api/channels/${encodeURIComponent(request.params.name)}`, (error, response, body) => {
-            reply(JSON.parse(body));
-        });
+        // r(`/${encodeURIComponent(request.params.name)}`, (error, response, body) => {
+        //     reply(JSON.parse(body));
+        // });
     }
 });
 
